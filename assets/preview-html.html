@@ -1,0 +1,3176 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>קבצי פרויקט קוגלי</title>
+    <style>
+      :root {
+        --bg-color: #121212;
+        --text-color: #f3f4f6;
+        --primary-color: #06b6d4;
+        --secondary-color: #0891b2;
+        --border-color: #374151;
+        --card-bg: #1f2937;
+        --hover-bg: #374151;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+        line-height: 1.6;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 20px;
+      }
+
+      h1 {
+        color: var(--primary-color);
+        margin-bottom: 10px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: var(--secondary-color);
+      }
+
+      button.secondary {
+        background-color: #4b5563;
+      }
+
+      button.secondary:hover {
+        background-color: #6b7280;
+      }
+
+      .file-tree {
+        margin-top: 30px;
+      }
+
+      .folder {
+        margin-bottom: 10px;
+      }
+
+      .folder-name {
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        border-radius: 4px;
+        background-color: var(--card-bg);
+        margin-bottom: 8px;
+      }
+
+      .folder-name:hover {
+        background-color: var(--hover-bg);
+      }
+
+      .folder-icon,
+      .file-icon {
+        margin-left: 8px;
+        display: inline-block;
+      }
+
+      .folder-icon::before {
+        content: "📁";
+      }
+
+      .folder.open .folder-icon::before {
+        content: "📂";
+      }
+
+      .file-icon::before {
+        content: "📄";
+      }
+
+      .folder-content {
+        padding-right: 20px;
+        display: none;
+      }
+
+      .folder.open .folder-content {
+        display: block;
+      }
+
+      .file-item {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+      }
+
+      .file-item:hover {
+        background-color: var(--hover-bg);
+      }
+
+      .file-name {
+        flex-grow: 1;
+      }
+
+      .file-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .download-btn {
+        background-color: #4b5563;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+      }
+
+      .download-btn:hover {
+        background-color: #6b7280;
+      }
+
+      .view-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+      }
+
+      .view-btn:hover {
+        background-color: var(--secondary-color);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+      }
+
+      .modal-content {
+        position: relative;
+        margin: 5% auto;
+        background-color: var(--card-bg);
+        padding: 20px;
+        width: 80%;
+        max-width: 900px;
+        max-height: 80vh;
+        border-radius: 8px;
+        overflow: auto;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #aaa;
+      }
+
+      .close-btn:hover {
+        color: white;
+      }
+
+      pre {
+        background-color: #1a1a1a;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        font-family: "Courier New", monospace;
+      }
+
+      .progress-container {
+        display: none;
+        margin: 20px auto;
+        text-align: center;
+      }
+
+      .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border-left-color: var(--primary-color);
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .instructions {
+        background-color: var(--card-bg);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 30px;
+        border-right: 4px solid var(--primary-color);
+      }
+
+      .instructions h3 {
+        margin-top: 0;
+        color: var(--primary-color);
+      }
+
+      #notification {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--primary-color);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        display: none;
+        z-index: 2000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>פרויקט קוגלי - מערכת AI בעברית</h1>
+        <p>גרסה 1.0.0 | נוצר ב-22 באפריל 2025</p>
+      </header>
+
+      <div class="actions">
+        <button id="download-all">הורד את כל הפרויקט (ZIP)</button>
+        <button id="expand-all" class="secondary">פתח את כל התיקיות</button>
+        <button id="collapse-all" class="secondary">סגור את כל התיקיות</button>
+      </div>
+
+      <div class="progress-container" id="progress-container">
+        <div class="spinner"></div>
+        <p id="progress-text">מכין קבצים להורדה...</p>
+      </div>
+
+      <div class="instructions">
+        <h3>הוראות שימוש</h3>
+        <p>דף זה מכיל את כל קבצי הפרויקט של מערכת קוגלי.</p>
+        <ul>
+          <li>
+            לחץ על <strong>הורד את כל הפרויקט</strong> לקבלת קובץ ZIP עם כל
+            הקבצים והתיקיות
+          </li>
+          <li>לחץ על שם תיקייה כדי לפתוח ולראות את תוכנה</li>
+          <li>השתמש בכפתור <strong>צפה</strong> כדי לראות את תוכן הקובץ</li>
+          <li>השתמש בכפתור <strong>הורד</strong> כדי להוריד קובץ בודד</li>
+        </ul>
+      </div>
+
+      <div class="file-tree" id="file-tree">
+        <!-- מבנה הקבצים ייבנה כאן באמצעות JavaScript -->
+      </div>
+    </div>
+
+    <div class="modal" id="file-modal">
+      <div class="modal-content">
+        <span class="close-btn" id="close-modal">&times;</span>
+        <h2 id="modal-file-name"></h2>
+        <pre id="modal-file-content"></pre>
+        <button id="modal-download-btn" class="view-btn">הורד קובץ זה</button>
+      </div>
+    </div>
+
+    <div id="notification">ההודעה תופיע כאן</div>
+
+    <script>
+      // תוכן הקבצים
+      const files = {
+        "App.jsx": `import React from 'react';
+import { MessageProvider } from './context/MessageContext';
+import { UiProvider } from './context/UiContext';
+import { AuthProvider } from './context/AuthContext';
+import Layout from './components/layout/Layout';
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <UiProvider>
+        <MessageProvider>
+          <Layout />
+        </MessageProvider>
+      </UiProvider>
+    </AuthProvider>
+  );
+};
+
+export default App;`,
+        "components/layout/Layout.jsx": `import React from 'react';
+import Header from './Header';
+import MainContent from './MainContent';
+import { useUiContext } from '../../context/UiContext';
+
+const Layout = () => {
+  const { state } = useUiContext();
+  const { activeTab } = state;
+
+  return (
+    <div className="flex flex-col h-screen bg-black text-right text-gray-100" dir="rtl">
+      <Header />
+      <MainContent activeTab={activeTab} />
+    </div>
+  );
+};
+
+export default Layout;`,
+        "components/layout/Header.jsx": `import React from 'react';
+import { MessageCircle, BarChart2, Upload, Users, Link2 } from 'lucide-react';
+import { useUiContext } from '../../context/UiContext';
+import { useAuthContext } from '../../context/AuthContext';
+
+const Header = () => {
+  const { state, setActiveTab } = useUiContext();
+  const { activeTab } = state;
+  const { currentUser } = useAuthContext();
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
+  // Extract first letter of user's name for avatar
+  const userInitial = currentUser?.name ? currentUser.name.charAt(0) : 'א';
+
+  return (
+    <header className="bg-gray-900 shadow-md border-b border-gray-800">
+      <div className="max-w-7xl mx-auto px-4 py-2">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-bold text-cyan-400">קוגלי</span>
+            <span className="text-sm bg-cyan-900 text-cyan-300 px-2 py-1 rounded">AI</span>
+          </div>
+          
+          <nav className="flex space-x-1">
+            <button
+              className={\`px-4 py-2 rounded-md flex items-center transition-all \${
+                activeTab === 'conversation' ? 'bg-gray-800 text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-300 hover:bg-gray-800'
+              }\`}
+              onClick={() => handleTabChange('conversation')}
+              aria-label="לשונית שיחה"
+            >
+              <MessageCircle size={18} className="ml-2" />
+              <span>שיחה</span>
+            </button>
+            <button
+              className={\`px-4 py-2 rounded-md flex items-center transition-all \${
+                activeTab === 'analytics' ? 'bg-gray-800 text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-300 hover:bg-gray-800'
+              }\`}
+              onClick={() => handleTabChange('analytics')}
+              aria-label="לשונית אנליזות"
+            >
+              <BarChart2 size={18} className="ml-2" />
+              <span>אנליזות</span>
+            </button>
+            <button
+              className={\`px-4 py-2 rounded-md flex items-center transition-all \${
+                activeTab === 'dataInput' ? 'bg-gray-800 text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-300 hover:bg-gray-800'
+              }\`}
+              onClick={() => handleTabChange('dataInput')}
+              aria-label="לשונית הזנת נתונים"
+            >
+              <Upload size={18} className="ml-2" />
+              <span>הזנת נתונים</span>
+            </button>
+            <button
+              className={\`px-4 py-2 rounded-md flex items-center transition-all \${
+                activeTab === 'users' ? 'bg-gray-800 text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-300 hover:bg-gray-800'
+              }\`}
+              onClick={() => handleTabChange('users')}
+              aria-label="לשונית משתמשים"
+            >
+              <Users size={18} className="ml-2" />
+              <span>משתמשים</span>
+            </button>
+            <button
+              className={\`px-4 py-2 rounded-md flex items-center transition-all \${
+                activeTab === 'integrations' ? 'bg-gray-800 text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-300 hover:bg-gray-800'
+              }\`}
+              onClick={() => handleTabChange('integrations')}
+              aria-label="לשונית אינטגרציות"
+            >
+              <Link2 size={18} className="ml-2" />
+              <span>אינטגרציות</span>
+            </button>
+          </nav>
+          
+          <div className="flex items-center">
+            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-gray-200">
+              {userInitial}
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;`,
+        "components/layout/MainContent.jsx": `import React, { lazy, Suspense } from 'react';
+
+// Lazy load tabs for better performance
+const ConversationTab = lazy(() => import('../conversation/ConversationTab'));
+const DataInputTab = lazy(() => import('../dataInput/DataInputTab'));
+const UsersTab = lazy(() => import('../users/UsersTab'));
+const IntegrationsTab = lazy(() => import('../integrations/IntegrationsTab'));
+const AnalyticsTab = lazy(() => import('../analytics/AnalyticsTab'));
+
+const MainContent = ({ activeTab }) => {
+  // Loading state for lazy loaded components
+  const renderLoader = () => (
+    <div className="flex items-center justify-center h-full">
+      <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+
+  return (
+    <main className="flex-grow overflow-hidden bg-gray-900">
+      <Suspense fallback={renderLoader()}>
+        {activeTab === 'conversation' && <ConversationTab />}
+        {activeTab === 'analytics' && <AnalyticsTab />}
+        {activeTab === 'dataInput' && <DataInputTab />}
+        {activeTab === 'users' && <UsersTab />}
+        {activeTab === 'integrations' && <IntegrationsTab />}
+      </Suspense>
+    </main>
+  );
+};
+
+export default MainContent;`,
+        "components/conversation/ConversationTab.jsx": `import React from 'react';
+import ConversationSidebar from './ConversationSidebar';
+import MessageList from './MessageList';
+import MessageInput from './MessageInput';
+import { useMessageContext } from '../../context/MessageContext';
+
+const ConversationTab = () => {
+  const { state } = useMessageContext();
+  const { loading, error } = state;
+
+  return (
+    <div dir="rtl" className="flex h-full">
+      <ConversationSidebar />
+      
+      <div className="flex-grow p-4 flex flex-col h-full">
+        {error && (
+          <div className="bg-red-900 text-red-100 p-3 rounded-lg mb-4">
+            <p>{error}</p>
+          </div>
+        )}
+        
+        <MessageList />
+        
+        <MessageInput disabled={loading} />
+      </div>
+    </div>
+  );
+};
+
+export default ConversationTab;`,
+        "components/conversation/ConversationSidebar.jsx": `import React from 'react';
+import { UserPlus } from 'lucide-react';
+import { useMessageContext } from '../../context/MessageContext';
+import { useUiContext } from '../../context/UiContext';
+
+const ConversationSidebar = () => {
+  const { state: messageState, changeMode } = useMessageContext();
+  const { selectedMode, selectedAgent } = messageState;
+  const { state: uiState, setModal } = useUiContext();
+
+  const handleModeChange = (mode) => {
+    changeMode(mode);
+  };
+
+  const handleAgentChange = (agent) => {
+    if (agent === 'add') {
+      setModal({ isOpen: true, type: 'agentModal' });
+    } else {
+      changeMode({ type: 'agent', value: agent });
+    }
+  };
+
+  return (
+    <div className="w-64 p-4 border-l border-gray-700">
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-3 text-gray-200">מצב התכתבות</h3>
+        <div className="space-y-2">
+          <div 
+            className={\`p-2 rounded-lg cursor-pointer transition-all flex items-center \${selectedMode === 'dataRepository' ? 'bg-gray-800 border-r-4 border-cyan-400' : 'hover:bg-gray-800'}\`}
+            onClick={() => handleModeChange('dataRepository')}
+          >
+            <div className={\`w-4 h-4 rounded-full ml-2 \${selectedMode === 'dataRepository' ? 'bg-cyan-400' : 'border border-gray-500'}\`}></div>
+            <span className="text-gray-200">מאגר המידע</span>
+          </div>
+          <div 
+            className={\`p-2 rounded-lg cursor-pointer transition-all flex items-center \${selectedMode === 'gptOnly' ? 'bg-gray-800 border-r-4 border-cyan-400' : 'hover:bg-gray-800'}\`}
+            onClick={() => handleModeChange('gptOnly')}
+          >
+            <div className={\`w-4 h-4 rounded-full ml-2 \${selectedMode === 'gptOnly' ? 'bg-cyan-400' : 'border border-gray-500'}\`}></div>
+            <span className="text-gray-200">GPT ללא מאגר מידע</span>
+          </div>
+          <div 
+            className={\`p-2 rounded-lg cursor-pointer transition-all flex items-center \${selectedMode === 'combined' ? 'bg-gray-800 border-r-4 border-cyan-400' : 'hover:bg-gray-800'}\`}
+            onClick={() => handleModeChange('combined')}
+          >
+            <div className={\`w-4 h-4 rounded-full ml-2 \${selectedMode === 'combined' ? 'bg-cyan-400' : 'border border-gray-500'}\`}></div>
+            <span className="text-gray-200">שאלות משולבות</span>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <h3 className="text-lg font-semibold mb-3 text-gray-200">בחירת סוכן</h3>
+        <div className="space-y-2">
+          <div 
+            className={\`p-2 rounded-lg cursor-pointer transition-all \${selectedAgent === 'free' ? 'bg-gray-800 border-r-4 border-cyan-400 text-cyan-100' : 'hover:bg-gray-800 text-gray-200'}\`}
+            onClick={() => handleAgentChange('free')}
+          >
+            חופשי
+          </div>
+          <div 
+            className={\`p-2 rounded-lg cursor-pointer transition-all \${selectedAgent === 'marketing' ? 'bg-gray-800 border-r-4 border-cyan-400 text-cyan-100' : 'hover:bg-gray-800 text-gray-200'}\`}
+            onClick={() => handleAgentChange('marketing')}
+          >
+            יועץ שיווקי
+          </div>
+          <div 
+            className={\`p-2 rounded-lg cursor-pointer transition-all \${selectedAgent === 'training' ? 'bg-gray-800 border-r-4 border-cyan-400 text-cyan-100' : 'hover:bg-gray-800 text-gray-200'}\`}
+            onClick={() => handleAgentChange('training')}
+          >
+            מאמן הדרכה
+          </div>
+          <div 
+            className="p-2 rounded-lg cursor-pointer transition-all bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-cyan-400"
+            onClick={() => handleAgentChange('add')}
+          >
+            <UserPlus size={16} className="ml-1" />
+            <span>הוספת סוכן</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ConversationSidebar;`,
+        "components/conversation/MessageList.jsx": `import React, { useCallback, useRef, useEffect } from 'react';
+import MessageItem from './MessageItem';
+import { useMessageContext } from '../../context/MessageContext';
+
+const MessageList = () => {
+  const { state } = useMessageContext();
+  const { messages, loading } = state;
+  const endOfMessagesRef = useRef(null);
+  
+  // Auto-scroll to the bottom when new messages arrive
+  const scrollToBottom = useCallback(() => {
+    if (endOfMessagesRef.current) {
+      endOfMessagesRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+  
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
+  
+  return (
+    <div className="flex-grow overflow-y-auto bg-gray-900 rounded-lg shadow-md mb-4 p-4 border border-gray-800">
+      {messages.map(message => (
+        <MessageItem key={message.id} message={message} />
+      ))}
+      
+      {loading && (
+        <div className="flex justify-center my-4">
+          <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      
+      <div ref={endOfMessagesRef} />
+    </div>
+  );
+};
+
+export default React.memo(MessageList);`,
+        "components/conversation/MessageItem.jsx": `import React from 'react';
+import { Info } from 'lucide-react';
+
+const MessageItem = ({ message }) => {
+  const { id, text, isUser, timestamp, sources } = message;
+  
+  return (
+    <div 
+      className="mb-6 flex"
+      style={{ justifyContent: isUser ? 'flex-end' : 'flex-start' }}
+    >
+      <div className="flex items-start gap-2 max-w-md">
+        {!isUser && (
+          <div className="w-8 h-8 rounded-full bg-cyan-700 flex-shrink-0 flex items-center justify-center text-cyan-100 font-bold" aria-hidden="true">
+            AI
+          </div>
+        )}
+        <div 
+          className={\`p-4 rounded-lg relative \${
+            isUser 
+              ? 'bg-gray-800 text-gray-100 border border-gray-700' 
+              : 'bg-gray-800 border border-cyan-900 text-cyan-100'
+          }\`}
+          role={isUser ? "complementary" : "region"}
+          aria-label={isUser ? "הודעה שלך" : "תשובת קוגלי"}
+        >
+          <div className="mb-1">{text}</div>
+          
+          {/* Sources for AI messages */}
+          {!isUser && sources && sources.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-gray-700">
+              <div className="text-xs text-gray-400 mb-1">מקורות:</div>
+              <div className="flex flex-wrap gap-1">
+                {sources.map((source, idx) => (
+                  <span key={idx} className="text-xs bg-gray-700 text-cyan-300 rounded px-1 py-0.5">{source}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Info icon with timestamp tooltip */}
+          <div className="absolute -top-1 -left-1 group">
+            <div 
+              className="w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center text-gray-400 cursor-help text-xs hover:bg-gray-600"
+              aria-label="צפה בזמן ההודעה"
+            >
+              <Info size={12} />
+            </div>
+            <div 
+              className="hidden group-hover:block absolute left-0 -translate-y-full -translate-x-1/2 bottom-6 bg-gray-800 text-gray-300 text-xs rounded p-2 shadow-lg border border-gray-700 whitespace-nowrap z-10"
+              role="tooltip"
+            >
+              {timestamp}
+            </div>
+          </div>
+        </div>
+        {isUser && (
+          <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-gray-300 font-bold" aria-hidden="true">
+            א
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default React.memo(MessageItem);`,
+        "components/conversation/MessageInput.jsx": `import React, { useState } from 'react';
+import { Send } from 'lucide-react';
+import { useMessageContext } from '../../context/MessageContext';
+
+const MessageInput = ({ disabled }) => {
+  const [inputValue, setInputValue] = useState('');
+  const { sendUserMessage } = useMessageContext();
+
+  const handleSendMessage = async () => {
+    if (inputValue.trim() === '') return;
+    
+    try {
+      await sendUserMessage(inputValue);
+      setInputValue(''); // Clear input only after successful send
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      // Error handling is managed by the context
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  return (
+    <div className="flex items-center">
+      <input
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="הקלד הודעה..."
+        className="flex-grow p-3 bg-gray-800 border border-gray-700 text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder-gray-500"
+        autoFocus
+        disabled={disabled}
+        aria-label="תוכן ההודעה"
+      />
+      <button 
+        onClick={handleSendMessage}
+        className="mr-2 p-3 bg-cyan-600 text-gray-100 rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={disabled || inputValue.trim() === ''}
+        aria-label="שלח הודעה"
+      >
+        <Send size={20} />
+      </button>
+    </div>
+  );
+};
+
+export default MessageInput;`,
+        "components/dataInput/DataInputTab.jsx": `import React, { useState } from 'react';
+import { Upload } from 'lucide-react';
+import DataInputSidebar from './DataInputSidebar';
+import { useDataUpload } from '../../hooks/useDataUpload';
+
+const DataInputTab = () => {
+  const [selectedType, setSelectedType] = useState('text');
+  const { uploadFiles, uploading, error } = useDataUpload();
+  
+  const handleFileSelect = async (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      try {
+        await uploadFiles(files, selectedType);
+      } catch (err) {
+        console.error('File upload failed:', err);
+      }
+    }
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      try {
+        await uploadFiles(e.dataTransfer.files, selectedType);
+      } catch (err) {
+        console.error('File upload failed:', err);
+      }
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  return (
+    <div className="h-full flex bg-gray-900" dir="rtl">
+      <DataInputSidebar selectedType={selectedType} onTypeSelect={setSelectedType} />
+      
+      <div className="flex-grow p-6 text-gray-100">
+        <h2 className="text-2xl font-bold mb-2">הזנת נתונים</h2>
+        <p className="text-gray-400 mb-6">העלה קבצים או הזן מידע למערכת</p>
+        
+        {error && (
+          <div className="bg-red-900 text-red-100 p-4 rounded-lg mb-6">
+            <p>{error}</p>
+          </div>
+        )}
+        
+        <div 
+          className="border-2 border-dashed border-gray-700 rounded-lg p-10 flex flex-col items-center justify-center bg-gray-800"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+        >
+          <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center text-cyan-400 mb-4">
+            <Upload size={30} />
+          </div>
+          <h3 className="text-lg font-semibold mb-2 text-gray-200">גרור ושחרר קבצים כאן</h3>
+          <p className="text-gray-400 mb-4 text-center">או לחץ על הכפתור לבחירת קבצים מהמחשב</p>
+          
+          <input 
+            type="file" 
+            id="file-upload" 
+            className="hidden" 
+            multiple 
+            onChange={handleFileSelect}
+            disabled={uploading}
+          />
+          <label 
+            htmlFor="file-upload" 
+            className={\`bg-cyan-600 text-gray-100 px-6 py-3 rounded-lg hover:bg-cyan-700 transition-colors cursor-pointer \${uploading ? 'opacity-50 cursor-not-allowed' : ''}\`}
+          >
+            {uploading ? 'מעלה קבצים...' : 'בחר קבצים'}
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DataInputTab;`,
+        "components/dataInput/DataInputSidebar.jsx": `import React from 'react';
+
+const DataInputSidebar = ({ selectedType, onTypeSelect }) => {
+  const fileTypes = [
+    { id: 'text', name: 'מסמכים טקסטואליים' },
+    { id: 'excel', name: 'טעינת אקסלים' },
+    { id: 'images', name: 'העלאת תמונות' },
+    { id: 'audio', name: 'קבצי קול' },
+    { id: 'meetings', name: 'הקלטות פגישות' },
+    { id: 'calls', name: 'הקלטות שיחות טלפוניות' },
+    { id: 'scanned', name: 'מסמכים סרוקים' },
+    { id: 'url', name: 'קישור לדף אינטרנט' },
+    { id: 'special', name: 'מיוחדים' }
+  ];
+
+  return (
+    <div className="w-64 bg-gray-900 border-l border-gray-700 overflow-y-auto p-4">
+      <div className="space-y-3">
+        {fileTypes.map(type => (
+          <div 
+            key={type.id}
+            className={\`p-2 rounded-lg cursor-pointer \${
+              selectedType === type.id 
+                ? 'bg-gray-800 text-cyan-400 border-r-2 border-cyan-500' 
+                : 'hover:bg-gray-800 text-gray-300'
+            }\`}
+            onClick={() => onTypeSelect(type.id)}
+            role="button"
+            aria-pressed={selectedType === type.id}
+          >
+            {type.name}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default React.memo(DataInputSidebar);`,
+        "components/users/UsersTab.jsx": `import React, { useState, useEffect } from 'react';
+import { UserPlus } from 'lucide-react';
+import UserTable from './UserTable';
+import UserModal from './UserModal';
+import { useUserService } from '../../hooks/useUserService';
+
+const UsersTab = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const { users, loading, error, fetchUsers } = useUserService();
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  const handleAddUser = () => {
+    setSelectedUser(null); // No user selected means we're adding a new one
+    setIsModalOpen(true);
+  };
+
+  const handleEditUser = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  return (
+    <div className="h-full flex flex-col overflow-y-auto bg-gray-900 p-6" dir="rtl">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-100">ניהול משתמשים</h2>
+        <button 
+          className="bg-cyan-600 text-gray-100 px-4 py-2 rounded-lg hover:bg-cyan-700 transition-colors flex items-center"
+          onClick={handleAddUser}
+        >
+          <UserPlus size={18} className="ml-2" />
+          הוסף משתמש
+        </button>
+      </div>
+      
+      {error && (
+        <div className="bg-red-900 text-red-100 p-4 rounded-lg mb-6">
+          <p>{error}</p>
+        </div>
+      )}
+      
+      {loading ? (
+        <div className="flex justify-center my-12">
+          <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <UserTable 
+          users={users} 
+          onEditUser={handleEditUser} 
+        />
+      )}
+      
+      {isModalOpen && (
+        <UserModal 
+          user={selectedUser} 
+          onClose={handleCloseModal} 
+        />
+      )}
+    </div>
+  );
+};
+
+export default UsersTab;`,
+        "components/users/UserTable.jsx": `import React from 'react';
+import { useUserService } from '../../hooks/useUserService';
+
+const UserTable = ({ users, onEditUser }) => {
+  const { deleteUser, deletingUserId } = useUserService();
+
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm('האם אתה בטוח שברצונך למחוק משתמש זה?')) {
+      try {
+        await deleteUser(userId);
+      } catch (error) {
+        console.error('Failed to delete user:', error);
+      }
+    }
+  };
+
+  if (!users || users.length === 0) {
+    return (
+      <div className="bg-gray-800 rounded-lg shadow-md border border-gray-700 p-8 text-center">
+        <p className="text-gray-400">אין משתמשים להצגה</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray-800 rounded-lg shadow-md border border-gray-700 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-700">
+          <thead className="bg-gray-800">
+            <tr>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">שם</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">אימייל</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">תפקיד</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">סטטוס</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">פעולות</th>
+            </tr>
+          </thead>
+          <tbody className="bg-gray-800 divide-y divide-gray-700">
+            {users.map((user) => (
+              <tr key={user.id} className="hover:bg-gray-700">
+                <td className="px-6 py-4 text-gray-300">{user.name}</td>
+                <td className="px-6 py-4 text-gray-300">{user.email}</td>
+                <td className="px-6 py-4 text-gray-300">{user.role}</td>
+                <td className="px-6 py-4">
+                  <span className={\`px-2 inline-flex text-xs leading-5 font-semibold rounded-full \${
+                    user.active ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'
+                  }\`}>
+                    {user.active ? 'פעיל' : 'לא פעיל'}
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex space-x-2">
+                    <button 
+                      className="text-cyan-400 hover:text-cyan-300 mx-1"
+                      onClick={() => onEditUser(user)}
+                    >
+                      ערוך
+                    </button>
+                    <button 
+                      className="text-red-400 hover:text-red-300 mx-1"
+                      onClick={() => handleDeleteUser(user.id)}
+                      disabled={deletingUserId === user.id}
+                    >
+                      {deletingUserId === user.id ? 'מוחק...' : 'מחק'}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+export default React.memo(UserTable);`,
+        "components/users/UserModal.jsx": `import React, { useState, useEffect } from 'react';
+import { useUserService } from '../../hooks/useUserService';
+
+const UserModal = ({ user, onClose }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: 'user',
+    active: true
+  });
+  
+  const [errors, setErrors] = useState({});
+  const { addUser, updateUser, loading } = useUserService();
+  
+  // Initialize form with user data if editing
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        role: user.role || 'user',
+        active: user.active !== undefined ? user.active : true
+      });
+    }
+  }, [user]);
+  
+  const validate = () => {
+    const newErrors = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'נדרש למלא שם';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'נדרש למלא אימייל';
+    } else if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(formData.email)) {
+      newErrors.email = 'כתובת אימייל לא תקינה';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validate()) return;
+    
+    try {
+      if (user) {
+        // Update existing user
+        await updateUser(user.id, formData);
+      } else {
+        // Add new user
+        await addUser(formData);
+      }
+      onClose();
+    } catch (error) {
+      console.error('Error saving user:', error);
+      setErrors(prev => ({ ...prev, submit: 'אירעה שגיאה בשמירת המשתמש' }));
+    }
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full border border-gray-700">
+        <h2 className="text-xl font-semibold mb-4 text-gray-100">
+          {user ? 'עריכת משתמש' : 'הוספת משתמש חדש'}
+        </h2>
+        
+        {errors.submit && (
+          <div className="bg-red-900 text-red-100 p-3 rounded mb-4">
+            {errors.submit}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">שם</label>
+              <input 
+                type="text" 
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={\`w-full p-2 bg-gray-700 border \${errors.name ? 'border-red-500' : 'border-gray-600'} rounded-md text-gray-200 placeholder-gray-500 focus:ring-cyan-500 focus:border-cyan-500\`}
+              />
+              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            </div>
+            
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">אימייל</label>
+              <input 
+                type="email" 
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={\`w-full p-2 bg-gray-700 border \${errors.email ? 'border-red-500' : 'border-gray-600'} rounded-md text-gray-200 placeholder-gray-500 focus:ring-cyan-500 focus:border-cyan-500\`}
+              />
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+            </div>
+            
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-300 mb-1">תפקיד</label>
+              <select 
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-200 focus:ring-cyan-500 focus:border-cyan-500"
+              >
+                <option value="user">משתמש</option>
+                <option value="admin">מנהל</option>
+                <option value="editor">עורך</option>
+              </select>
+            </div>
+            
+            <div className="flex items-center">
+              <input 
+                type="checkbox" 
+                id="active"
+                name="active"
+                checked={formData.active}
+                onChange={handleChange}
+                className="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-500 rounded"
+              />
+              <label htmlFor="active" className="mr-2 block text-sm text-gray-300">
+                משתמש פעיל
+              </label>
+            </div>
+          </div>
+          
+          <div className="flex justify-end mt-6 gap-2">
+            <button 
+              type="button"
+              className="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 border border-gray-600"
+              onClick={onClose}
+              disabled={loading}
+            >
+              ביטול
+            </button>
+            <button 
+              type="submit"
+              className="px-4 py-2 bg-cyan-600 text-gray-100 rounded-md hover:bg-cyan-700 disabled:opacity-50"
+              disabled={loading}
+            >
+              {loading ? 'שומר...' : user ? 'עדכן' : 'הוסף'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default UserModal;`,
+        "components/integrations/IntegrationsTab.jsx": `import React, { useEffect } from 'react';
+import IntegrationCard from './IntegrationCard';
+import { useIntegrationService } from '../../hooks/useIntegrationService';
+
+const IntegrationsTab = () => {
+  const { integrations, loading, error, fetchIntegrations } = useIntegrationService();
+
+  useEffect(() => {
+    fetchIntegrations();
+  }, [fetchIntegrations]);
+
+  return (
+    <div className="h-full flex flex-col overflow-y-auto bg-gray-900 p-6" dir="rtl">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-100">אינטגרציות</h2>
+      </div>
+      
+      {error && (
+        <div className="bg-red-900 text-red-100 p-4 rounded-lg mb-6">
+          <p>{error}</p>
+        </div>
+      )}
+      
+      {loading ? (
+        <div className="flex justify-center my-12">
+          <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {integrations.map(integration => (
+            <IntegrationCard 
+              key={integration.id} 
+              integration={integration} 
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default IntegrationsTab;`,
+        "components/integrations/IntegrationCard.jsx": `import React from 'react';
+import { Link2 } from 'lucide-react';
+import { useIntegrationService } from '../../hooks/useIntegrationService';
+
+const IntegrationCard = ({ integration }) => {
+  const { connectIntegration, syncIntegration, loadingIntegrationId } = useIntegrationService();
+  const { id, name, category, description, isConnected } = integration;
+  
+  const handleConnect = async () => {
+    try {
+      await connectIntegration(id);
+    } catch (error) {
+      console.error('Failed to connect integration:', error);
+    }
+  };
+  
+  const handleSync = async () => {
+    try {
+      await syncIntegration(id);
+    } catch (error) {
+      console.error('Failed to sync integration:', error);
+    }
+  };
+  
+  const isLoading = loadingIntegrationId === id;
+  
+  return (
+    <div className="border border-gray-700 rounded-lg overflow-hidden bg-gray-800">
+      <div className="bg-gray-800 p-4 flex items-center border-b border-gray-700">
+        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-cyan-400 ml-3">
+          <Link2 size={20} />
+        </div>
+        <div>
+          <h3 className="font-semibold text-gray-200">{name}</h3>
+          <p className="text-xs text-gray-400">{category}</p>
+        </div>
+      </div>
+      <div className="p-4">
+        <p className="text-sm text-gray-400 mb-4">{description}</p>
+        
+        <div className="flex flex-wrap gap-2">
+          <button 
+            className="flex-grow bg-cyan-600 text-gray-100 px-3 py-2 rounded-md hover:bg-cyan-700 transition-colors text-sm disabled:opacity-50"
+            onClick={isConnected ? handleSync : handleConnect}
+            disabled={isLoading}
+          >
+            {isLoading 
+              ? 'מעבד...' 
+              : isConnected 
+                ? 'סנכרן עכשיו' 
+                : 'התחבר'
+            }
+          </button>
+          
+          {isConnected && (
+            <button 
+              className="flex-grow bg-gray-700 text-gray-300 px-3 py-2 rounded-md hover:bg-gray-600 transition-colors text-sm"
+              disabled={isLoading}
+            >
+              הגדרות
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default React.memo(IntegrationCard);`,
+        "components/analytics/AnalyticsTab.jsx": `import React, { useState, useEffect } from 'react';
+import AnalyticsDashboard from './AnalyticsDashboard';
+import { useAnalyticsService } from '../../hooks/useAnalyticsService';
+
+const AnalyticsTab = () => {
+  const [timeRange, setTimeRange] = useState('week');
+  const { analytics, loading, error, fetchAnalytics } = useAnalyticsService();
+
+  useEffect(() => {
+    fetchAnalytics(timeRange);
+  }, [fetchAnalytics, timeRange]);
+
+  return (
+    <div className="h-full flex flex-col overflow-y-auto bg-gray-900 p-6" dir="rtl">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-100">אנליזות</h2>
+        
+        <div className="flex rounded-md overflow-hidden">
+          <button 
+            className={\`px-4 py-2 \${timeRange === 'day' ? 'bg-cyan-600 text-white' : 'bg-gray-800 text-gray-300'}\`}
+            onClick={() => setTimeRange('day')}
+          >
+            יום
+          </button>
+          <button 
+            className={\`px-4 py-2 \${timeRange === 'week' ? 'bg-cyan-600 text-white' : 'bg-gray-800 text-gray-300'}\`}
+            onClick={() => setTimeRange('week')}
+          >
+            שבוע
+          </button>
+          <button 
+            className={\`px-4 py-2 \${timeRange === 'month' ? 'bg-cyan-600 text-white' : 'bg-gray-800 text-gray-300'}\`}
+            onClick={() => setTimeRange('month')}
+          >
+            חודש
+          </button>
+          <button 
+            className={\`px-4 py-2 \${timeRange === 'year' ? 'bg-cyan-600 text-white' : 'bg-gray-800 text-gray-300'}\`}
+            onClick={() => setTimeRange('year')}
+          >
+            שנה
+          </button>
+        </div>
+      </div>
+      
+      {error && (
+        <div className="bg-red-900 text-red-100 p-4 rounded-lg mb-6">
+          <p>{error}</p>
+        </div>
+      )}
+      
+      {loading ? (
+        <div className="flex justify-center my-12">
+          <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <AnalyticsDashboard data={analytics} timeRange={timeRange} />
+      )}
+    </div>
+  );
+};
+
+export default AnalyticsTab;`,
+        "components/analytics/AnalyticsDashboard.jsx": `import React from 'react';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
+const AnalyticsDashboard = ({ data, timeRange }) => {
+  const { messageStats, topSources, dailyActivity } = data;
+  
+  // Colors for charts
+  const COLORS = ['#00C4FF', '#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  
+  // Data for message stats pie chart
+  const messageData = [
+    { name: 'הודעות משתמש', value: messageStats.userMessages },
+    { name: 'הודעות AI', value: messageStats.aiMessages },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Summary Cards */}
+      <div className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
+          <h3 className="text-gray-400 text-sm mb-1">סה"כ הודעות</h3>
+          <p className="text-3xl font-bold text-cyan-400">{messageStats.total}</p>
+        </div>
+        
+        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
+          <h3 className="text-gray-400 text-sm mb-1">הודעות משתמש</h3>
+          <p className="text-3xl font-bold text-cyan-400">{messageStats.userMessages}</p>
+          <p className="text-xs text-gray-400">
+            {Math.round((messageStats.userMessages / messageStats.total) * 100)}% מסך ההודעות
+          </p>
+        </div>
+        
+        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
+          <h3 className="text-gray-400 text-sm mb-1">הודעות AI</h3>
+          <p className="text-3xl font-bold text-cyan-400">{messageStats.aiMessages}</p>
+          <p className="text-xs text-gray-400">
+            {Math.round((messageStats.aiMessages / messageStats.total) * 100)}% מסך ההודעות
+          </p>
+        </div>
+      </div>
+      
+      {/* Message Type Distribution */}
+      <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
+        <h3 className="text-lg font-medium text-gray-200 mb-4">התפלגות סוגי הודעות</h3>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={messageData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+                nameKey="name"
+                label={({ name, percent }) => \`\${name}: \${(percent * 100).toFixed(0)}%\`}
+              >
+                {messageData.map((entry, index) => (
+                  <Cell key={\`cell-\${index}\`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      {/* Top Sources */}
+      <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
+        <h3 className="text-lg font-medium text-gray-200 mb-4">מקורות מידע נפוצים</h3>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={topSources}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              layout="vertical"
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" />
+              <YAxis dataKey="name" type="category" width={150} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#00C4FF" name="מספר שימושים" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      {/* Daily Activity - Spans full width */}
+      <div className="col-span-full bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
+        <h3 className="text-lg font-medium text-gray-200 mb-4">פעילות לאורך זמן</h3>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={dailyActivity}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis yAxisId="left" orientation="left" stroke="#00C4FF" />
+              <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+              <Tooltip />
+              <Legend />
+              <Line
+                yAxisId="left"
+                type="monotone"
+                dataKey="messages"
+                stroke="#00C4FF"
+                name="הודעות"
+                activeDot={{ r: 8 }}
+              />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="conversations"
+                stroke="#82ca9d"
+                name="שיחות"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      {/* Export Options */}
+      <div className="col-span-full flex justify-end mt-4">
+        <button className="bg-gray-700 text-gray-200 px-4 py-2 rounded mr-2 hover:bg-gray-600">
+          ייצוא לאקסל
+        </button>
+        <button className="bg-gray-700 text-gray-200 px-4 py-2 rounded mr-2 hover:bg-gray-600">
+          ייצוא ל-PDF
+        </button>
+        <button className="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">
+          הדפסה
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default React.memo(AnalyticsDashboard);`,
+        "components/common/AgentModal.jsx": `import React, { useState } from 'react';
+import { useMessageContext } from '../../context/MessageContext';
+import { useUiContext } from '../../context/UiContext';
+
+const AgentModal = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    role: '',
+    prompt: ''
+  });
+  
+  const [errors, setErrors] = useState({});
+  const { addAgent, loading } = useMessageContext();
+  const { closeModal } = useUiContext();
+  
+  const validate = () => {
+    const newErrors = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'נדרש למלא שם';
+    }
+    
+    if (!formData.role.trim()) {
+      newErrors.role = 'נדרש למלא תפקיד';
+    }
+    
+    if (!formData.prompt.trim()) {
+      newErrors.prompt = 'נדרש למלא פרומפט';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleSubmit = async () => {
+    if (!validate()) return;
+    
+    try {
+      await addAgent(formData);
+      closeModal();
+    } catch (error) {
+      console.error('Error adding agent:', error);
+      setErrors(prev => ({ ...prev, submit: 'אירעה שגיאה בהוספת הסוכן' }));
+    }
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full border border-gray-700">
+        <h2 className="text-xl font-semibold mb-4 text-gray-100">הוספת סוכן חדש</h2>
+        
+        {errors.submit && (
+          <div className="bg-red-900 text-red-100 p-3 rounded mb-4">
+            {errors.submit}
+          </div>
+        )}
+        
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">שם</label>
+            <input 
+              type="text" 
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className={\`w-full p-2 bg-gray-700 border \${errors.name ? 'border-red-500' : 'border-gray-600'} rounded-md text-gray-200 placeholder-gray-500 focus:ring-cyan-500 focus:border-cyan-500\`}
+            />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+          </div>
+          
+          <div>
+            <label htmlFor="role" className="block text-sm font-medium text-gray-300 mb-1">תפקיד</label>
+            <input 
+              type="text" 
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className={\`w-full p-2 bg-gray-700 border \${errors.role ? 'border-red-500' : 'border-gray-600'} rounded-md text-gray-200 placeholder-gray-500 focus:ring-cyan-500 focus:border-cyan-500\`}
+            />
+            {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role}</p>}
+          </div>
+          
+          <div>
+            <label htmlFor="prompt" className="block text-sm font-medium text-gray-300 mb-1">פרומפט</label>
+            <textarea 
+              id="prompt"
+              name="prompt"
+              value={formData.prompt}
+              onChange={handleChange}
+              className={\`w-full p-2 bg-gray-700 border \${errors.prompt ? 'border-red-500' : 'border-gray-600'} rounded-md text-gray-200 placeholder-gray-500 focus:ring-cyan-500 focus:border-cyan-500 h-24\`}
+            />
+            {errors.prompt && <p className="text-red-500 text-xs mt-1">{errors.prompt}</p>}
+          </div>
+        </div>
+        
+        <div className="flex justify-end mt-6 gap-2">
+          <button 
+            className="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 border border-gray-600"
+            onClick={closeModal}
+            disabled={loading}
+          >
+            ביטול
+          </button>
+          <button 
+            className="px-4 py-2 bg-cyan-600 text-gray-100 rounded-md hover:bg-cyan-700 disabled:opacity-50"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? 'מוסיף...' : 'הוסף סוכן'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AgentModal;`,
+        "context/MessageContext.jsx": `import React, { createContext, useContext, useReducer, useCallback } from 'react';
+import { formatDate } from '../utils/dateFormatter';
+import { messageService } from '../services/index';
+import { agentService } from '../services/index';
+
+// Define action types
+const ADD_MESSAGE = 'ADD_MESSAGE';
+const SET_MESSAGES = 'SET_MESSAGES';
+const SET_LOADING = 'SET_LOADING';
+const SET_ERROR = 'SET_ERROR';
+const CHANGE_MODE = 'CHANGE_MODE';
+const CHANGE_AGENT = 'CHANGE_AGENT';
+const ADD_AGENT = 'ADD_AGENT';
+const SET_AGENTS = 'SET_AGENTS';
+
+// Initial state
+const initialState = {
+  messages: [
+    { 
+      id: 1, 
+      text: 'ברוך הבא למערכת הצ\\'אט של קוגלי. במה אוכל לעזור?', 
+      isUser: false,
+      timestamp: formatDate(),
+      sources: ['מאגר מידע פנימי']
+    }
+  ],
+  loading: false,
+  error: null,
+  selectedMode: 'dataRepository',
+  selectedAgent: 'free',
+  agents: [
+    { id: 'free', name: 'חופשי', role: 'כללי' },
+    { id: 'marketing', name: 'יועץ שיווקי', role: 'שיווק' },
+    { id: 'training', name: 'מאמן הדרכה', role: 'הדרכה' }
+  ]
+};
+
+// Reducer function
+const messageReducer = (state, action) => {
+  switch (action.type) {
+    case ADD_MESSAGE:
+      return {
+        ...state,
+        messages: [...state.messages, action.payload]
+      };
+    case SET_MESSAGES:
+      return {
+        ...state,
+        messages: action.payload
+      };
+    case SET_LOADING:
+      return {
+        ...state,
+        loading: action.payload
+      };
+    case SET_ERROR:
+      return {
+        ...state,
+        error: action.payload
+      };
+    case CHANGE_MODE:
+      return {
+        ...state,
+        selectedMode: action.payload
+      };
+    case CHANGE_AGENT:
+      return {
+        ...state,
+        selectedAgent: action.payload
+      };
+    case ADD_AGENT:
+      return {
+        ...state,
+        agents: [...state.agents, action.payload]
+      };
+    case SET_AGENTS:
+      return {
+        ...state,
+        agents: action.payload
+      };
+    default:
+      return state;
+  }
+};
+
+// Create context
+const MessageContext = createContext();
+
+// Create provider component
+export const MessageProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(messageReducer, initialState);
+  
+  // Add a single message to the state
+  const addMessage = useCallback((message) => {
+    dispatch({ type: ADD_MESSAGE, payload: message });
+  }, []);
+  
+  // Set the entire messages array
+  const setMessages = useCallback((messages) => {
+    dispatch({ type: SET_MESSAGES, payload: messages });
+  }, []);
+  
+  // Set loading state
+  const setLoading = useCallback((isLoading) => {
+    dispatch({ type: SET_LOADING, payload: isLoading });
+  }, []);
+  
+  // Set error state
+  const setError = useCallback((error) => {
+    dispatch({ type: SET_ERROR, payload: error });
+  }, []);
+  
+  // Change conversation mode
+  const changeMode = useCallback((mode) => {
+    dispatch({ type: CHANGE_MODE, payload: mode });
+    
+    // Add system message about mode change
+    const modeMessages = {
+      'dataRepository': 'תשובות שיתקבלו מעכשיו יתבססו על מאגר המידע',
+      'gptOnly': 'תשובות שיתקבלו מעכשיו יתבססו על GPT בלבד',
+      'combined': 'תשובות שיתקבלו מעכשיו יתבססו על שאלות משולבות'
+    };
+    
+    addMessage({ 
+      id: Date.now(), 
+      text: modeMessages[mode], 
+      isUser: false,
+      timestamp: formatDate(),
+      sources: ['הגדרות מערכת']
+    });
+  }, [addMessage]);
+  
+  // Change selected agent
+  const changeAgent = useCallback((agent) => {
+    dispatch({ type: CHANGE_AGENT, payload: agent });
+    
+    // Add system message about agent change
+    const agent = state.agents.find(a => a.id === agent) || { name: 'חופשי' };
+    
+    addMessage({ 
+      id: Date.now(), 
+      text: \`עברת לסוכן: \${agent.name}\`, 
+      isUser: false,
+      timestamp: formatDate(),
+      sources: ['הגדרות מערכת']
+    });
+  }, [addMessage, state.agents]);
+  
+  // Fetch chat history
+  const fetchChatHistory = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const history = await messageService.getChatHistory();
+      setMessages(history);
+    } catch (error) {
+      console.error('Failed to fetch chat history:', error);
+      setError('אירעה שגיאה בטעינת היסטוריית הצ\\'אט');
+    } finally {
+      setLoading(false);
+    }
+  }, [setLoading, setError, setMessages]);
+  
+  // Send a new user message and get AI response
+  const sendUserMessage = useCallback(async (text) => {
+    if (!text || text.trim() === '') return;
+    
+    // Add user message to the state
+    const userMessage = { 
+      id: Date.now(), 
+      text, 
+      isUser: true,
+      timestamp: formatDate()
+    };
+    
+    addMessage(userMessage);
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Call API to get AI response
+      const response = await messageService.sendMessage(text, state.selectedMode, state.selectedAgent);
+      
+      // Add AI response to the state
+      const aiMessage = { 
+        id: Date.now() + 1, 
+        text: response.text, 
+        isUser: false,
+        timestamp: formatDate(),
+        sources: response.sources || ['מאגר מידע פנימי']
+      };
+      
+      addMessage(aiMessage);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setError('אירעה שגיאה בשליחת ההודעה');
+    } finally {
+      setLoading(false);
+    }
+  }, [addMessage, setLoading, setError, state.selectedMode, state.selectedAgent]);
+  
+  // Add a new agent
+  const addAgent = useCallback(async (agentData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Call API to add the agent
+      const newAgent = await agentService.addAgent(agentData);
+      
+      // Add the new agent to the state
+      dispatch({ type: ADD_AGENT, payload: newAgent });
+      
+      // Add system message about agent addition
+      addMessage({ 
+        id: Date.now(), 
+        text: \`הסוכן \${newAgent.name} נוסף בהצלחה\`, 
+        isUser: false,
+        timestamp: formatDate(),
+        sources: ['הגדרות מערכת']
+      });
+      
+      return newAgent;
+    } catch (error) {
+      console.error('Failed to add agent:', error);
+      setError('אירעה שגיאה בהוספת הסוכן');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [addMessage, setLoading, setError]);
+  
+  // Fetch all agents
+  const fetchAgents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const agents = await agentService.getAgents();
+      dispatch({ type: SET_AGENTS, payload: agents });
+    } catch (error) {
+      console.error('Failed to fetch agents:', error);
+      setError('אירעה שגיאה בטעינת הסוכנים');
+    } finally {
+      setLoading(false);
+    }
+  }, [setLoading, setError]);
+  
+  return (
+    <MessageContext.Provider value={{ 
+      state, 
+      addMessage, 
+      setMessages,
+      setLoading, 
+      setError, 
+      changeMode, 
+      changeAgent,
+      fetchChatHistory,
+      sendUserMessage,
+      addAgent,
+      fetchAgents
+    }}>
+      {children}
+    </MessageContext.Provider>
+  );
+};
+
+// Custom hook to use the context
+export const useMessageContext = () => {
+  const context = useContext(MessageContext);
+  if (!context) {
+    throw new Error('useMessageContext must be used within a MessageProvider');
+  }
+  return context;
+};`,
+        "context/UiContext.jsx": `import React, { createContext, useContext, useReducer, useCallback, useMemo } from 'react';
+import AgentModal from '../components/common/AgentModal';
+
+// Define action types
+const SET_ACTIVE_TAB = 'SET_ACTIVE_TAB';
+const SET_MODAL = 'SET_MODAL';
+const CLOSE_MODAL = 'CLOSE_MODAL';
+
+// Initial state
+const initialState = {
+  activeTab: 'conversation',
+  modal: {
+    isOpen: false,
+    type: null
+  }
+};
+
+// Reducer function
+const uiReducer = (state, action) => {
+  switch (action.type) {
+    case SET_ACTIVE_TAB:
+      return {
+        ...state,
+        activeTab: action.payload
+      };
+    case SET_MODAL:
+      return {
+        ...state,
+        modal: {
+          isOpen: true,
+          type: action.payload.type,
+          props: action.payload.props
+        }
+      };
+    case CLOSE_MODAL:
+      return {
+        ...state,
+        modal: {
+          isOpen: false,
+          type: null,
+          props: null
+        }
+      };
+    default:
+      return state;
+  }
+};
+
+// Create context
+const UiContext = createContext();
+
+// Create provider component
+export const UiProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(uiReducer, initialState);
+  
+  // Tab management
+  const setActiveTab = useCallback((tab) => {
+    dispatch({ type: SET_ACTIVE_TAB, payload: tab });
+  }, []);
+  
+  // Modal management
+  const setModal = useCallback((modalConfig) => {
+    dispatch({ type: SET_MODAL, payload: modalConfig });
+  }, []);
+  
+  const closeModal = useCallback(() => {
+    dispatch({ type: CLOSE_MODAL });
+  }, []);
+  
+  // Mapping of modal types to components
+  const modalComponents = useMemo(() => ({
+    agentModal: AgentModal
+  }), []);
+  
+  // Current modal to display
+  const CurrentModal = state.modal.isOpen 
+    ? modalComponents[state.modal.type] 
+    : null;
+  
+  return (
+    <UiContext.Provider value={{ 
+      state, 
+      setActiveTab,
+      setModal,
+      closeModal
+    }}>
+      {children}
+      
+      {/* Render current modal if one is open */}
+      {CurrentModal && <CurrentModal {...(state.modal.props || {})} />}
+    </UiContext.Provider>
+  );
+};
+
+// Custom hook to use the context
+export const useUiContext = () => {
+  const context = useContext(UiContext);
+  if (!context) {
+    throw new Error('useUiContext must be used within a UiProvider');
+  }
+  return context;
+};`,
+        "context/AuthContext.jsx": `import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { authService } from '../services/index';
+
+// Create context
+const AuthContext = createContext();
+
+// Create provider component
+export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Check for existing login session on component mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const user = await authService.getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error('Authentication check failed:', error);
+        setError('אירעה שגיאה באימות המשתמש');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+  
+  // Login function
+  const login = useCallback(async (email, password) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const user = await authService.login(email, password);
+      setCurrentUser(user);
+      return user;
+    } catch (error) {
+      console.error('Login failed:', error);
+      setError('אירעה שגיאה בהתחברות, אנא בדוק את פרטי הכניסה');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  
+  // Logout function
+  const logout = useCallback(async () => {
+    setLoading(true);
+    
+    try {
+      await authService.logout();
+      setCurrentUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      setError('אירעה שגיאה בהתנתקות');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  
+  // Update user profile
+  const updateProfile = useCallback(async (userData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const updatedUser = await authService.updateProfile(userData);
+      setCurrentUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error('Profile update failed:', error);
+      setError('אירעה שגיאה בעדכון הפרופיל');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  
+  // The value to be provided to consumers
+  const value = {
+    currentUser,
+    loading,
+    error,
+    login,
+    logout,
+    updateProfile
+  };
+  
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// Custom hook to use the auth context
+export const useAuthContext = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuthContext must be used within an AuthProvider');
+  }
+  return context;
+};`,
+        "utils/dateFormatter.js": `/**
+ * Formats the current date and time in the Israeli format
+ * @param {Date} date - Optional date object, defaults to current date and time
+ * @returns {string} Formatted date string in DD/MM/YY HH:MM format
+ */
+export const formatDate = (date = new Date()) => {
+  // Ensure we're working with a Date object
+  const d = date instanceof Date ? date : new Date(date);
+  
+  // Check if the date is valid
+  if (isNaN(d.getTime())) {
+    console.error('Invalid date provided to formatDate:', date);
+    return 'תאריך לא תקין';
+  }
+  
+  // Format with zero-padding where needed
+  const hours = d.getHours().toString().padStart(2, '0');
+  const minutes = d.getMinutes().toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const year = d.getFullYear().toString().slice(-2);
+  
+  return \`\${day}/\${month}/\${year} \${hours}:\${minutes}\`;
+};
+
+/**
+ * Formats a date relative to now (e.g., "2 hours ago")
+ * @param {Date|string} date - The date to format
+ * @returns {string} Human-readable relative time
+ */
+export const formatRelativeTime = (date) => {
+  const now = new Date();
+  const d = date instanceof Date ? date : new Date(date);
+  
+  // Check if the date is valid
+  if (isNaN(d.getTime())) {
+    console.error('Invalid date provided to formatRelativeTime:', date);
+    return 'זמן לא תקין';
+  }
+  
+  const diffInSeconds = Math.floor((now - d) / 1000);
+  
+  if (diffInSeconds < 60) {
+    return 'עכשיו';
+  }
+  
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return \`לפני \${diffInMinutes} דקות\`;
+  }
+  
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return \`לפני \${diffInHours} שעות\`;
+  }
+  
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) {
+    return \`לפני \${diffInDays} ימים\`;
+  }
+  
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) {
+    return \`לפני \${diffInMonths} חודשים\`;
+  }
+  
+  const diffInYears = Math.floor(diffInMonths / 12);
+  return \`לפני \${diffInYears} שנים\`;
+};
+
+/**
+ * Parse a date string in the format "DD/MM/YY HH:MM"
+ * @param {string} dateString - Date string in Israeli format
+ * @returns {Date} JavaScript Date object
+ */
+export const parseDate = (dateString) => {
+  if (!dateString || typeof dateString !== 'string') {
+    console.error('Invalid date string provided to parseDate:', dateString);
+    return new Date();
+  }
+  
+  try {
+    const [datePart, timePart] = dateString.split(' ');
+    const [day, month, year] = datePart.split('/').map(num => parseInt(num, 10));
+    const [hours, minutes] = timePart.split(':').map(num => parseInt(num, 10));
+    
+    // Note: month is 0-indexed in JavaScript Date
+    return new Date(2000 + year, month - 1, day, hours, minutes);
+  } catch (error) {
+    console.error('Error parsing date:', error);
+    return new Date();
+  }
+};`,
+        "services/index.js": `// This file contains mock implementations of all API services
+// In a real application, these would make actual API calls
+
+import { formatDate } from '../utils/dateFormatter';
+
+// Mock data
+let mockMessages = [
+  { 
+    id: 1, 
+    text: 'ברוך הבא למערכת הצ\\'אט של קוגלי. במה אוכל לעזור?', 
+    isUser: false,
+    timestamp: formatDate(new Date(2025, 3, 21, 8, 30)),
+    sources: ['מאגר מידע פנימי']
+  }
+];
+
+let mockUsers = [
+  { id: 1, name: 'משתמש 1', email: 'user1@example.com', role: 'מנהל', active: true },
+  { id: 2, name: 'משתמש 2', email: 'user2@example.com', role: 'משתמש', active: true },
+  { id: 3, name: 'משתמש 3', email: 'user3@example.com', role: 'משתמש', active: true },
+  { id: 4, name: 'משתמש 4', email: 'user4@example.com', role: 'משתמש', active: true },
+  { id: 5, name: 'משתמש 5', email: 'user5@example.com', role: 'משתמש', active: false }
+];
+
+let mockAgents = [
+  { id: 'free', name: 'חופשי', role: 'כללי', prompt: '' },
+  { id: 'marketing', name: 'יועץ שיווקי', role: 'שיווק', prompt: 'אתה יועץ שיווקי מומחה' },
+  { id: 'training', name: 'מאמן הדרכה', role: 'הדרכה', prompt: 'אתה מאמן הדרכה מומחה' }
+];
+
+let mockIntegrations = [
+  { id: 1, name: 'אינטגרציה 1', category: 'מאגרי מידע', description: 'תיאור האינטגרציה יופיע כאן', isConnected: true },
+  { id: 2, name: 'אינטגרציה 2', category: 'מערכות ניהול', description: 'תיאור האינטגרציה יופיע כאן', isConnected: false },
+  { id: 3, name: 'אינטגרציה 3', category: 'שיווק', description: 'תיאור האינטגרציה יופיע כאן', isConnected: true },
+  { id: 4, name: 'אינטגרציה 4', category: 'מכירות', description: 'תיאור האינטגרציה יופיע כאן', isConnected: false },
+  { id: 5, name: 'אינטגרציה 5', category: 'שירות לקוחות', description: 'תיאור האינטגרציה יופיע כאן', isConnected: true },
+  { id: 6, name: 'אינטגרציה 6', category: 'משאבי אנוש', description: 'תיאור האינטגרציה יופיע כאן', isConnected: false }
+];
+
+let mockCurrentUser = {
+  id: 1,
+  name: 'אבי כהן',
+  email: 'avi@example.com',
+  role: 'מנהל'
+};
+
+// Helper to simulate API delay
+const delay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Mock response for AI messages based on conversation mode
+const getAIResponse = async (text, mode) => {
+  // Generate a mock response based on the mode
+  let responseText = '';
+  let sources = [];
+  
+  switch (mode) {
+    case 'dataRepository':
+      responseText = \`קיבלתי את השאלה שלך: "\${text}". הנה התשובה ממאגר המידע...\`;
+      sources = ['מאגר מידע פנימי', 'Google Drive', 'SharePoint'];
+      break;
+    case 'gptOnly':
+      responseText = \`קיבלתי את השאלה שלך: "\${text}". הנה התשובה מ-GPT...\`;
+      sources = ['מודל GPT'];
+      break;
+    case 'combined':
+      responseText = \`קיבלתי את השאלה שלך: "\${text}". הנה התשובה משולבת...\`;
+      sources = ['מאגר מידע פנימי', 'מודל GPT'];
+      break;
+    default:
+      responseText = \`קיבלתי את השאלה שלך: "\${text}". אני מעבד את המידע...\`;
+      sources = ['מאגר מידע פנימי'];
+  }
+  
+  return {
+    text: responseText,
+    sources
+  };
+};
+
+// Mock Services
+export const messageService = {
+  getChatHistory: async () => {
+    await delay();
+    return [...mockMessages];
+  },
+  
+  sendMessage: async (text, mode, agent) => {
+    await delay(1000);
+    const response = await getAIResponse(text, mode);
+    
+    const newMessage = {
+      id: Date.now(),
+      text: response.text,
+      isUser: false,
+      timestamp: formatDate(),
+      sources: response.sources
+    };
+    
+    mockMessages.push(newMessage);
+    return response;
+  },
+  
+  clearHistory: async () => {
+    await delay();
+    mockMessages = [];
+    return true;
+  }
+};
+
+export const authService = {
+  getCurrentUser: async () => {
+    await delay();
+    return { ...mockCurrentUser };
+  },
+  
+  login: async (email, password) => {
+    await delay();
+    // Simulate authentication
+    if (email && password) {
+      return { ...mockCurrentUser };
+    }
+    throw new Error('אימייל או סיסמה לא תקינים');
+  },
+  
+  logout: async () => {
+    await delay();
+    return true;
+  },
+  
+  updateProfile: async (userData) => {
+    await delay();
+    mockCurrentUser = { ...mockCurrentUser, ...userData };
+    return { ...mockCurrentUser };
+  }
+};
+
+export const userService = {
+  getUsers: async () => {
+    await delay();
+    return [...mockUsers];
+  },
+  
+  getUserById: async (id) => {
+    await delay();
+    const user = mockUsers.find(user => user.id === id);
+    if (!user) throw new Error('משתמש לא נמצא');
+    return { ...user };
+  },
+  
+  addUser: async (userData) => {
+    await delay();
+    const newUser = {
+      id: mockUsers.length + 1,
+      ...userData
+    };
+    mockUsers.push(newUser);
+    return { ...newUser };
+  },
+  
+  updateUser: async (id, userData) => {
+    await delay();
+    const index = mockUsers.findIndex(user => user.id === id);
+    if (index === -1) throw new Error('משתמש לא נמצא');
+    
+    mockUsers[index] = { ...mockUsers[index], ...userData };
+    return { ...mockUsers[index] };
+  },
+  
+  deleteUser: async (id) => {
+    await delay();
+    const index = mockUsers.findIndex(user => user.id === id);
+    if (index === -1) throw new Error('משתמש לא נמצא');
+    
+    mockUsers = mockUsers.filter(user => user.id !== id);
+    return true;
+  }
+};
+
+export const agentService = {
+  getAgents: async () => {
+    await delay();
+    return [...mockAgents];
+  },
+  
+  addAgent: async (agentData) => {
+    await delay();
+    const newAgent = {
+      id: \`agent-\${Date.now()}\`,
+      ...agentData
+    };
+    mockAgents.push(newAgent);
+    return { ...newAgent };
+  },
+  
+  updateAgent: async (id, agentData) => {
+    await delay();
+    const index = mockAgents.findIndex(agent => agent.id === id);
+    if (index === -1) throw new Error('סוכן לא נמצא');
+    
+    mockAgents[index] = { ...mockAgents[index], ...agentData };
+    return { ...mockAgents[index] };
+  },
+  
+  deleteAgent: async (id) => {
+    await delay();
+    const index = mockAgents.findIndex(agent => agent.id === id);
+    if (index === -1) throw new Error('סוכן לא נמצא');
+    
+    mockAgents = mockAgents.filter(agent => agent.id !== id);
+    return true;
+  }
+};
+
+export const integrationService = {
+  getIntegrations: async () => {
+    await delay();
+    return [...mockIntegrations];
+  },
+  
+  connectIntegration: async (id) => {
+    await delay();
+    const index = mockIntegrations.findIndex(integration => integration.id === id);
+    if (index === -1) throw new Error('אינטגרציה לא נמצאה');
+    
+    mockIntegrations[index].isConnected = true;
+    return { ...mockIntegrations[index] };
+  },
+  
+  syncIntegration: async (id) => {
+    await delay(1500);
+    const index = mockIntegrations.findIndex(integration => integration.id === id);
+    if (index === -1) throw new Error('אינטגרציה לא נמצאה');
+    
+    return { success: true, message: 'סנכרון הושלם בהצלחה' };
+  }
+};
+
+export const dataUploadService = {
+  uploadFiles: async (files, type) => {
+    await delay(2000);
+    
+    // Simulate upload success
+    return {
+      success: true,
+      filesUploaded: files.length,
+      message: \`\${files.length} קבצים הועלו בהצלחה\`
+    };
+  }
+};
+
+// Mock analytics data
+const generateMockAnalyticsData = (timeRange) => {
+  const data = {
+    messageStats: {
+      total: 0,
+      userMessages: 0,
+      aiMessages: 0
+    },
+    topSources: [],
+    dailyActivity: []
+  };
+  
+  // Set base numbers based on time range
+  let factor = 1;
+  let days = 7;
+  
+  switch (timeRange) {
+    case 'day':
+      factor = 1;
+      days = 1;
+      break;
+    case 'week':
+      factor = 7;
+      days = 7;
+      break;
+    case 'month':
+      factor = 30;
+      days = 30;
+      break;
+    case 'year':
+      factor = 365;
+      days = 30; // Show last 30 days for year view
+      break;
+  }
+  
+  // Generate message stats
+  data.messageStats.total = Math.floor(120 * factor);
+  data.messageStats.userMessages = Math.floor(50 * factor);
+  data.messageStats.aiMessages = Math.floor(70 * factor);
+  
+  // Generate top sources
+  data.topSources = [
+    { name: 'מאגר מידע פנימי', count: Math.floor(80 * factor) },
+    { name: 'Google Drive', count: Math.floor(30 * factor) },
+    { name: 'SharePoint', count: Math.floor(25 * factor) },
+    { name: 'מודל GPT', count: Math.floor(15 * factor) }
+  ];
+  
+  // Generate daily activity data
+  const now = new Date();
+  for (let i = 0; i < days; i++) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    
+    data.dailyActivity.unshift({
+      date: formatDate(date).split(' ')[0], // Just the date part
+      conversations: Math.floor(Math.random() * 10 * factor) + 1,
+      messages: Math.floor(Math.random() * 20 * factor) + 5
+    });
+  }
+  
+  return data;
+};
+
+export const analyticsService = {
+  getAnalytics: async (timeRange = 'week') => {
+    await delay();
+    return generateMockAnalyticsData(timeRange);
+  }
+};`,
+        "hooks/useUserService.js": `import { useState, useCallback } from 'react';
+import { userService } from '../services/index';
+
+/**
+ * Hook for managing user-related operations
+ */
+export const useUserService = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [deletingUserId, setDeletingUserId] = useState(null);
+
+  /**
+   * Fetches all users
+   */
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const fetchedUsers = await userService.getUsers();
+      setUsers(fetchedUsers);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+      setError(err.message || 'אירעה שגיאה בטעינת המשתמשים');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  /**
+   * Adds a new user
+   */
+  const addUser = useCallback(async (userData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const newUser = await userService.addUser(userData);
+      setUsers(prevUsers => [...prevUsers, newUser]);
+      return newUser;
+    } catch (err) {
+      console.error('Failed to add user:', err);
+      setError(err.message || 'אירעה שגיאה בהוספת המשתמש');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  /**
+   * Updates an existing user
+   */
+  const updateUser = useCallback(async (id, userData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const updatedUser = await userService.updateUser(id, userData);
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === id ? updatedUser : user
+        )
+      );
+      return updatedUser;
+    } catch (err) {
+      console.error('Failed to update user:', err);
+      setError(err.message || 'אירעה שגיאה בעדכון המשתמש');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  /**
+   * Deletes a user
+   */
+  const deleteUser = useCallback(async (id) => {
+    setDeletingUserId(id);
+    setError(null);
+    
+    try {
+      await userService.deleteUser(id);
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+      setError(err.message || 'אירעה שגיאה במחיקת המשתמש');
+      throw err;
+    } finally {
+      setDeletingUserId(null);
+    }
+  }, []);
+
+  return {
+    users,
+    loading,
+    error,
+    deletingUserId,
+    fetchUsers,
+    addUser,
+    updateUser,
+    deleteUser
+  };
+};`,
+        "hooks/useIntegrationService.js": `import { useState, useCallback } from 'react';
+import { integrationService } from '../services/index';
+
+/**
+ * Hook for managing integration-related operations
+ */
+export const useIntegrationService = () => {
+  const [integrations, setIntegrations] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [loadingIntegrationId, setLoadingIntegrationId] = useState(null);
+
+  /**
+   * Fetches all integrations
+   */
+  const fetchIntegrations = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const fetchedIntegrations = await integrationService.getIntegrations();
+      setIntegrations(fetchedIntegrations);
+    } catch (err) {
+      console.error('Failed to fetch integrations:', err);
+      setError(err.message || 'אירעה שגיאה בטעינת האינטגרציות');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  /**
+   * Connects an integration
+   */
+  const connectIntegration = useCallback(async (id) => {
+    setLoadingIntegrationId(id);
+    setError(null);
+    
+    try {
+      const updatedIntegration = await integrationService.connectIntegration(id);
+      setIntegrations(prevIntegrations => 
+        prevIntegrations.map(integration => 
+          integration.id === id ? updatedIntegration : integration
+        )
+      );
+      return updatedIntegration;
+    } catch (err) {
+      console.error('Failed to connect integration:', err);
+      setError(err.message || 'אירעה שגיאה בהתחברות לאינטגרציה');
+      throw err;
+    } finally {
+      setLoadingIntegrationId(null);
+    }
+  }, []);
+
+  /**
+   * Syncs an integration
+   */
+  const syncIntegration = useCallback(async (id) => {
+    setLoadingIntegrationId(id);
+    setError(null);
+    
+    try {
+      const result = await integrationService.syncIntegration(id);
+      return result;
+    } catch (err) {
+      console.error('Failed to sync integration:', err);
+      setError(err.message || 'אירעה שגיאה בסנכרון האינטגרציה');
+      throw err;
+    } finally {
+      setLoadingIntegrationId(null);
+    }
+  }, []);
+
+  return {
+    integrations,
+    loading,
+    error,
+    loadingIntegrationId,
+    fetchIntegrations,
+    connectIntegration,
+    syncIntegration
+  };
+};`,
+        "hooks/useDataUpload.js": `import { useState, useCallback } from 'react';
+import { dataUploadService } from '../services/index';
+
+/**
+ * Hook for managing file upload operations
+ */
+export const useDataUpload = () => {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState(null);
+  const [uploadResult, setUploadResult] = useState(null);
+
+  /**
+   * Uploads files of a specific type
+   * @param {FileList} files - The files to upload
+   * @param {string} type - The type of files being uploaded (e.g., 'text', 'excel', etc.)
+   */
+  const uploadFiles = useCallback(async (files, type) => {
+    if (!files || files.length === 0) {
+      setError('לא נבחרו קבצים להעלאה');
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+    setUploadResult(null);
+    
+    try {
+      // Validate file types based on the selected category
+      validateFiles(files, type);
+      
+      // Proceed with upload
+      const result = await dataUploadService.uploadFiles(files, type);
+      setUploadResult(result);
+      return result;
+    } catch (err) {
+      console.error('Failed to upload files:', err);
+      setError(err.message || 'אירעה שגיאה בהעלאת הקבצים');
+      throw err;
+    } finally {
+      setUploading(false);
+    }
+  }, []);
+
+  /**
+   * Validates that files match the expected type
+   */
+  const validateFiles = (files, type) => {
+    // Define allowed extensions for each file type
+    const allowedExtensions = {
+      text: ['.txt', '.doc', '.docx', '.pdf', '.rtf'],
+      excel: ['.xls', '.xlsx', '.csv'],
+      images: ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg'],
+      audio: ['.mp3', '.wav', '.ogg', '.m4a'],
+      meetings: ['.mp4', '.webm', '.avi', '.mov'],
+      calls: ['.mp3', '.wav', '.ogg'],
+      scanned: ['.pdf', '.jpg', '.jpeg', '.png', '.tiff']
+      // url and special don't need extension validation
+    };
+    
+    // Skip validation for URL and special types
+    if (type === 'url' || type === 'special') return;
+    
+    // Check if any file has an invalid extension
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileName = file.name.toLowerCase();
+      const validExtension = (allowedExtensions[type] || []).some(ext => 
+        fileName.endsWith(ext)
+      );
+      
+      if (!validExtension) {
+        throw new Error(\`הקובץ "\${file.name}" אינו בפורמט מתאים לקטגוריה שנבחרה.\`);
+      }
+    }
+  };
+
+  return {
+    uploading,
+    error,
+    uploadResult,
+    uploadFiles
+  };
+};`,
+        "hooks/useAnalyticsService.js": `import { useState, useCallback } from 'react';
+import { analyticsService } from '../services/index';
+
+/**
+ * Hook for managing analytics data and operations
+ */
+export const useAnalyticsService = () => {
+  const [analytics, setAnalytics] = useState({
+    messageStats: { total: 0, userMessages: 0, aiMessages: 0 },
+    topSources: [],
+    dailyActivity: []
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  /**
+   * Fetches analytics data for a specific time range
+   * @param {string} timeRange - The time range for analytics (day, week, month, year)
+   */
+  const fetchAnalytics = useCallback(async (timeRange = 'week') => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const data = await analyticsService.getAnalytics(timeRange);
+      setAnalytics(data);
+      return data;
+    } catch (err) {
+      console.error('Failed to fetch analytics:', err);
+      setError(err.message || 'אירעה שגיאה בטעינת נתוני האנליזה');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  /**
+   * Exports analytics data in a specified format
+   * @param {string} format - The export format (csv, pdf, excel)
+   */
+  const exportAnalytics = useCallback(async (format = 'csv') => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Normally this would call an API endpoint to generate and download the export
+      // For now, we'll just simulate a delay and return a success message
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // In a real application, this would trigger a file download
+      const result = {
+        success: true,
+        message: \`נתוני האנליזה יוצאו בהצלחה בפורמט \${format.toUpperCase()}\`,
+        format
+      };
+      
+      return result;
+    } catch (err) {
+      console.error('Failed to export analytics:', err);
+      setError(err.message || 'אירעה שגיאה בייצוא נתוני האנליזה');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    analytics,
+    loading,
+    error,
+    fetchAnalytics,
+    exportAnalytics
+  };
+};`,
+      };
+
+      // מבנה העץ של התיקיות והקבצים
+      const fileTree = {
+        "App.jsx": true,
+        components: {
+          layout: {
+            "Layout.jsx": true,
+            "Header.jsx": true,
+            "MainContent.jsx": true,
+          },
+          conversation: {
+            "ConversationTab.jsx": true,
+            "ConversationSidebar.jsx": true,
+            "MessageList.jsx": true,
+            "MessageItem.jsx": true,
+            "MessageInput.jsx": true,
+          },
+          dataInput: {
+            "DataInputTab.jsx": true,
+            "DataInputSidebar.jsx": true,
+          },
+          users: {
+            "UsersTab.jsx": true,
+            "UserTable.jsx": true,
+            "UserModal.jsx": true,
+          },
+          integrations: {
+            "IntegrationsTab.jsx": true,
+            "IntegrationCard.jsx": true,
+          },
+          analytics: {
+            "AnalyticsTab.jsx": true,
+            "AnalyticsDashboard.jsx": true,
+          },
+          common: {
+            "AgentModal.jsx": true,
+          },
+        },
+        context: {
+          "MessageContext.jsx": true,
+          "UiContext.jsx": true,
+          "AuthContext.jsx": true,
+        },
+        utils: {
+          "dateFormatter.js": true,
+        },
+        services: {
+          "index.js": true,
+        },
+        hooks: {
+          "useUserService.js": true,
+          "useIntegrationService.js": true,
+          "useDataUpload.js": true,
+          "useAnalyticsService.js": true,
+        },
+      };
+
+      // בניית עץ הקבצים
+      const buildFileTree = (tree, parent = "", level = 0) => {
+        const container = document.createElement("div");
+
+        // מיון התיקיות תחילה, ואז הקבצים
+        const entries = Object.entries(tree);
+        const sorted = entries.sort((a, b) => {
+          const aIsFile = a[1] === true;
+          const bIsFile = b[1] === true;
+
+          if (aIsFile === bIsFile) {
+            return a[0].localeCompare(b[0]);
+          }
+
+          return aIsFile ? 1 : -1;
+        });
+
+        for (const [name, content] of sorted) {
+          const path = parent ? `${parent}/${name}` : name;
+
+          if (content === true) {
+            // זהו קובץ
+            const fileItem = document.createElement("div");
+            fileItem.className = "file-item";
+            fileItem.innerHTML = `
+            <div class="file-icon"></div>
+            <div class="file-name">${name}</div>
+            <div class="file-actions">
+              <button class="view-btn" data-path="${path}">צפה</button>
+              <button class="download-btn" data-path="${path}">הורד</button>
+            </div>
+          `;
+            container.appendChild(fileItem);
+          } else {
+            // זוהי תיקייה
+            const folderDiv = document.createElement("div");
+            folderDiv.className = "folder";
+            folderDiv.dataset.path = path;
+
+            const folderName = document.createElement("div");
+            folderName.className = "folder-name";
+            folderName.innerHTML = `<div class="folder-icon"></div>${name}`;
+            folderName.onclick = () => {
+              folderDiv.classList.toggle("open");
+            };
+
+            const folderContent = document.createElement("div");
+            folderContent.className = "folder-content";
+
+            const childContent = buildFileTree(content, path, level + 1);
+            folderContent.appendChild(childContent);
+
+            folderDiv.appendChild(folderName);
+            folderDiv.appendChild(folderContent);
+            container.appendChild(folderDiv);
+          }
+        }
+
+        return container;
+      };
+
+      // מאזיני אירועים
+      document.addEventListener("DOMContentLoaded", () => {
+        const fileTreeContainer = document.getElementById("file-tree");
+        const modal = document.getElementById("file-modal");
+        const modalFileName = document.getElementById("modal-file-name");
+        const modalFileContent = document.getElementById("modal-file-content");
+        const modalDownloadBtn = document.getElementById("modal-download-btn");
+        const notification = document.getElementById("notification");
+        const progressContainer = document.getElementById("progress-container");
+
+        // בניית עץ הקבצים
+        const treeContent = buildFileTree(fileTree);
+        fileTreeContainer.appendChild(treeContent);
+
+        // אירועי צפייה והורדה של קבצים
+        fileTreeContainer.addEventListener("click", (e) => {
+          if (e.target.classList.contains("view-btn")) {
+            const path = e.target.dataset.path;
+            const content = files[path];
+
+            if (content) {
+              modalFileName.textContent = path;
+              modalFileContent.textContent = content;
+              modalDownloadBtn.dataset.path = path;
+              modal.style.display = "block";
+            }
+          } else if (e.target.classList.contains("download-btn")) {
+            const path = e.target.dataset.path;
+            const content = files[path];
+
+            if (content) {
+              downloadFile(path, content);
+              showNotification(`הקובץ "${path}" הורד בהצלחה`);
+            }
+          }
+        });
+
+        // סגירת המודל
+        document.getElementById("close-modal").addEventListener("click", () => {
+          modal.style.display = "none";
+        });
+
+        // הורדה מתוך המודל
+        modalDownloadBtn.addEventListener("click", () => {
+          const path = modalDownloadBtn.dataset.path;
+          const content = files[path];
+
+          if (content) {
+            downloadFile(path, content);
+            showNotification(`הקובץ "${path}" הורד בהצלחה`);
+          }
+        });
+
+        // הורדת כל הפרויקט
+        document
+          .getElementById("download-all")
+          .addEventListener("click", async () => {
+            progressContainer.style.display = "block";
+            document.getElementById("progress-text").textContent =
+              "מכין קבצים להורדה...";
+
+            try {
+              await downloadZip();
+              showNotification("כל קבצי הפרויקט הורדו בהצלחה");
+            } catch (error) {
+              showNotification("אירעה שגיאה בהורדת הקבצים", true);
+            } finally {
+              progressContainer.style.display = "none";
+            }
+          });
+
+        // פתיחת כל התיקיות
+        document.getElementById("expand-all").addEventListener("click", () => {
+          document.querySelectorAll(".folder").forEach((folder) => {
+            folder.classList.add("open");
+          });
+        });
+
+        // סגירת כל התיקיות
+        document
+          .getElementById("collapse-all")
+          .addEventListener("click", () => {
+            document.querySelectorAll(".folder").forEach((folder) => {
+              folder.classList.remove("open");
+            });
+          });
+
+        // סגירת המודל בלחיצה מחוץ לתוכן
+        window.addEventListener("click", (e) => {
+          if (e.target === modal) {
+            modal.style.display = "none";
+          }
+        });
+      });
+
+      // פונקציה להורדת קובץ בודד
+      function downloadFile(filename, content) {
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename.split("/").pop();
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // פונקציה להצגת הודעות
+      function showNotification(message, isError = false) {
+        const notification = document.getElementById("notification");
+        notification.textContent = message;
+        notification.style.backgroundColor = isError ? "#e53e3e" : "#06b6d4";
+        notification.style.display = "block";
+
+        setTimeout(() => {
+          notification.style.display = "none";
+        }, 3000);
+      }
+
+      // פונקציה להורדת כל הפרויקט בקובץ ZIP
+      async function downloadZip() {
+        // טעינת JSZip באמצעות CDN
+        if (!window.JSZip) {
+          return new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src =
+              "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+            script.onload = () => resolve(createAndDownloadZip());
+            script.onerror = () =>
+              reject(new Error("Failed to load JSZip library"));
+            document.head.appendChild(script);
+          });
+        } else {
+          return createAndDownloadZip();
+        }
+      }
+
+      // יצירת קובץ ZIP והורדתו
+      async function createAndDownloadZip() {
+        try {
+          const JSZip = window.JSZip;
+          const zip = new JSZip();
+
+          // מעבר על הקבצים והוספתם לZIP
+          for (const [path, content] of Object.entries(files)) {
+            const pathParts = path.split("/");
+            let folder = zip;
+
+            // יצירת תיקיות בתוך הZIP
+            for (let i = 0; i < pathParts.length - 1; i++) {
+              folder = folder.folder(pathParts[i]);
+            }
+
+            // הוספת הקובץ לתיקייה המתאימה
+            folder.file(pathParts[pathParts.length - 1], content);
+
+            // עדכון הודעת התקדמות
+            document.getElementById(
+              "progress-text"
+            ).textContent = `מוסיף קובץ: ${path}`;
+          }
+
+          document.getElementById("progress-text").textContent =
+            "מכין קובץ ZIP להורדה...";
+
+          // יצירת הZIP והורדתו
+          const content = await zip.generateAsync({ type: "blob" });
+          const url = URL.createObjectURL(content);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "kogly-project.zip";
+          a.click();
+          URL.revokeObjectURL(url);
+
+          return true;
+        } catch (error) {
+          console.error("Error creating ZIP file:", error);
+          throw error;
+        }
+      }
+    </script>
+  </body>
+</html>
